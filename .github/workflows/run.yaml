@@ -19,7 +19,7 @@ jobs:
         name: 'Get templates'
         outputs:
             templates: ${{ steps.getlist.outputs.templates }}
-        steps: 
+        steps:
           - uses: actions/checkout@v2
           - name: Setup Python
             uses: actions/setup-python@v2
@@ -43,7 +43,7 @@ jobs:
         name: 'Template'
         strategy:
             fail-fast: false
-            matrix: 
+            matrix:
                 template: ${{fromJSON(needs.build.outputs.templates)}}
                 exclude:
                   - template: 'nuxtjs'
@@ -106,7 +106,7 @@ jobs:
                   - template: 'spring-mvc-maven-mongodb'
                   - template: 'micronaut'
                   - template: 'pelican'
-                  - template: 'wordpress-composer'
+                  #- template: 'wordpress-composer'
                   - template: 'rails'
                   - template: 'aspnet-core'
                   - template: 'gin'
@@ -114,7 +114,8 @@ jobs:
                   - template: 'gatsby-drupal'
                   - template: 'microprofile-payara'
                   - template: 'sculpin'
-        steps: 
+                  - template: 'drupal9'
+        steps:
             - uses: actions/checkout@v2
             - name: Setup Python
               uses: actions/setup-python@v2
@@ -145,13 +146,13 @@ jobs:
                 path: templates/${{ matrix.template }}/build
             - name: 'Initialize remote'
               run: |
-                # Get the remote 
+                # Get the remote
                 export TEMPLATE=${{ matrix.template }}
 
                 REMOTE_UPSTREAM=$(poetry run python -c '
                 import os
                 import dodo
-                try: 
+                try:
                     print(dodo.project_factory(os.environ["TEMPLATE"]).remote)
                 except:
                     print("no remote")
