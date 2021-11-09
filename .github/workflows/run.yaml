@@ -191,7 +191,7 @@ jobs:
 
                   responsecode=$(echo "${response}" | jq '.number')
                   echo "::set-output name=pull-request-number::${responsecode}"
-                  headresponseline=$(head n -1 headers.txt)
+                  headresponseline=$(head -n 1 headers.txt)
                   regex="^HTTP\/2 ([\d]{3})$"
                   if [[ ${headresponselines} =~ ${regex} ]]; then
                     echo "::set-output name=pr_response_code::${BASH_REMATCH[1]}"
