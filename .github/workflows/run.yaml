@@ -182,8 +182,29 @@ jobs:
               run: |
                 python -m poetry run doit push:${{ matrix.template }}
             - name: 'Open pull request'
+              id: open-pull-request
               run: |
-                  curl -s --location --request POST --header "Authorization: Bearer $GITHUB_TOKEN" \
+                  response=$(curl -s --location --request POST --header "Authorization: Bearer $GITHUB_TOKEN" \
                     --header 'Content-Type: application/json' \
                     --data-raw '{"head": "update", "base": "master", "title": "auto-updates"}' \
-                    https://api.github.com/repos/gilzow/${{ matrix.template }}/pulls
+                    --D headers.txt
+                    https://api.github.com/repos/gilzow/${{ matrix.template }}/pulls)
+                  responsecode=$(echo "${response}" | jq '.number')
+                  echo "::set-output name=pull-request-number::${responsecode}"
+                  headresponseline=$(head n -1 headers.txt)
+                  regex="^HTTP\/2 ([\d]{3})$"
+                  if [[ ${headresponselines} =~ ${regex} ]]; then
+                    echo "::set-output name=pr_response_code::${BASH_REMATCH[1]}"
+                  fi
+            - name: Enable Pull Request Automerge
+              if: steps.open-pull-request.outputs.pr_response_code == 201
+              uses: peter-evans/enable-pull-request-automerge@v1
+              with:
+                token: ${{ secrets.DEVREL_TOKEN }}
+                    pull-request-number: ${{ steps.open-pull-request.outputs.pull-request-number }}
+            - name: Auto approve
+              if: steps.open-pull-request.outputs.pr_response_code == 201
+              uses: juliangruber/approve-pull-request-action@v1
+              with:
+                github-token: ${{ secrets.DEVREL_TOKEN }}
+                number: ${{ steps.open-pull-request.outputs.pull-request-number }}
