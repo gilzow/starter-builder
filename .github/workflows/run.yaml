@@ -199,7 +199,7 @@ jobs:
             - name: Doublecheck output values
               run: |
                   echo "The pr_response code is ${{ steps.open-pull-request.outputs.pr_response_code }}"
-                  echo "The Pr number is ${{ steps.open-pull-request.outputs.pull-request-number }}
+                  echo "The Pr number is ${{ steps.open-pull-request.outputs.pull-request-number }}"
             - name: Enable Pull Request Automerge
               if: steps.open-pull-request.outputs.pr_response_code == '201'
               uses: peter-evans/enable-pull-request-automerge@v1
