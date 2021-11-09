@@ -201,7 +201,7 @@ jobs:
               uses: peter-evans/enable-pull-request-automerge@v1
               with:
                 token: ${{ secrets.DEVREL_TOKEN }}
-                    pull-request-number: ${{ steps.open-pull-request.outputs.pull-request-number }}
+                pull-request-number: ${{ steps.open-pull-request.outputs.pull-request-number }}
             - name: Auto approve
               if: steps.open-pull-request.outputs.pr_response_code == 201
               uses: juliangruber/approve-pull-request-action@v1
