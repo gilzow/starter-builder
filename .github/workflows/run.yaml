@@ -187,8 +187,8 @@ jobs:
                   response=$(curl -s --location --request POST --header "Authorization: Bearer $GITHUB_TOKEN" \
                     --header 'Content-Type: application/json' \
                     --data-raw '{"head": "update", "base": "master", "title": "auto-updates"}' \
-                    -D headers.txt
-                    https://api.github.com/repos/gilzow/${{ matrix.template }}/pulls)
+                    -D headers.txt https://api.github.com/repos/gilzow/${{ matrix.template }}/pulls)
+
                   responsecode=$(echo "${response}" | jq '.number')
                   echo "::set-output name=pull-request-number::${responsecode}"
                   headresponseline=$(head n -1 headers.txt)
