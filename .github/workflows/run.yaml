@@ -187,7 +187,7 @@ jobs:
               run: |
                   response=$(curl -s --location --request POST --header "Authorization: Bearer $GITHUB_TOKEN" \
                     --header 'Content-Type: application/json' \
-                    --data-raw '{"head": "update", "base": "master", "title": "auto-updates"}' \
+                    --data-raw '{"head": "update", "base": "master", "title": "auto-updates", "auto_merge": "true"}' \
                     -D headers.txt https://api.github.com/repos/gilzow/${{ matrix.template }}/pulls)
 
                   prnumber=$(echo "${response}" | jq '.number')
@@ -228,13 +228,13 @@ jobs:
                   #echo "Message from merge acceptance was ${mergeMessage}"
 
 
-            - name: Enable Pull Request Automerge
-              if: steps.open-pull-request.outputs.pr_response_code == '201'
-              uses: peter-evans/enable-pull-request-automerge@v1
-              with:
-                repository: gilzow/${{ matrix.template }}
-                token: ${{ secrets.DEVREL_TOKEN }}
-                pull-request-number: ${{ steps.open-pull-request.outputs.pull-request-number }}
+            #- name: Enable Pull Request Automerge
+              #if: steps.open-pull-request.outputs.pr_response_code == '201'
+              #uses: peter-evans/enable-pull-request-automerge@v1
+              #with:
+                #repository: gilzow/${{ matrix.template }}
+                #token: ${{ secrets.DEVREL_TOKEN }}
+                #pull-request-number: ${{ steps.open-pull-request.outputs.pull-request-number }}
             #- name: Auto approve
               #if: steps.open-pull-request.outputs.pr_response_code == '201'
               #uses: juliangruber/approve-pull-request-action@v1
