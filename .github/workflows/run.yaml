@@ -12,6 +12,7 @@ env:
     GITHUB_TOKEN: ${{ secrets.DEVREL_TOKEN }}
     GIT_EMAIL: ${{ secrets.DEVREL_EMAIL }}
     GIT_USER: ${{ secrets.DEVREL_USER }}
+    RESPONSE_CODE_REGEX: "HTTP/2 ([0-9]{3})"
 
 jobs:
     build:
@@ -189,14 +190,14 @@ jobs:
                     --data-raw '{"head": "update", "base": "master", "title": "auto-updates"}' \
                     -D headers.txt https://api.github.com/repos/gilzow/${{ matrix.template }}/pulls)
 
-                  responsecode=$(echo "${response}" | jq '.number')
-                  echo "::set-output name=pull-request-number::${responsecode}"
+                  prnumber=$(echo "${response}" | jq '.number')
+                  echo "::set-output name=pull-request-number::${prnumber}"
                   headresponseline=$(head -n 1 headers.txt)
                   echo "headresponseline is ${headresponseline}"
                   # regex="^HTTP\/2 ([\d]{3})$"
                   # there is some non printable character at the end of the line that doesnt match \s
                   regex="HTTP/2 ([0-9]{3})"
-                  if [[ ${headresponseline} =~ ${regex} ]]; then
+                  if [[ ${headresponseline} =~ ${RESPONSE_CODE_REGEX} ]]; then
                     echo "::set-output name=pr_response_code::${BASH_REMATCH[1]}"
                   else
                     echo "no match for response code?"
@@ -205,13 +206,35 @@ jobs:
               run: |
                   echo "The pr_response code is ${{ steps.open-pull-request.outputs.pr_response_code }}"
                   echo "The Pr number is ${{ steps.open-pull-request.outputs.pull-request-number }}"
-            - name: Enable Pull Request Automerge
+            - name: Merge Pull Request
               if: steps.open-pull-request.outputs.pr_response_code == '201'
-              uses: peter-evans/enable-pull-request-automerge@v1
-              with:
-                repository: gilzow/${{ matrix.template }}
-                token: ${{ secrets.DEVREL_TOKEN }}
-                pull-request-number: ${{ steps.open-pull-request.outputs.pull-request-number }}
+              run: |
+                  response=$(curl -s --location --request PUT --header "Authorization: Bearer $GITHUB_TOKEN" \
+                    --header 'Accept: application/vnd.github.v3+json' \
+                    -d '{"commit_title":"Auto Update Acceptance from Template Updater"}' \
+                    -D headers.txt https://api.github.com/repos/gilzow/${{ matrix.template }}/pulls/${{ steps.open-pull-request.outputs.pull-request-number }}/merge)
+
+                  headresponseline=$(head -n 1 headers.txt)
+                  if [[ ${headresponseline} =~ ${RESPONSE_CODE_REGEX} ]]; then
+                    responsecode=${BASH_REMATCH[1]}
+                  else
+                    responsecode="No code received"
+                  fi
+
+                  echo "response code from merge acceptance was ${responsecode}"
+
+                  mergeMessage=$(echo "${response}" | jq '.message')
+
+                  echo "Message from merge acceptance was ${mergeMessage}"
+
+
+            #- name: Enable Pull Request Automerge
+              #if: steps.open-pull-request.outputs.pr_response_code == '201'
+              #uses: peter-evans/enable-pull-request-automerge@v1
+              #with:
+                #repository: gilzow/${{ matrix.template }}
+                #token: ${{ secrets.DEVREL_TOKEN }}
+                #pull-request-number: ${{ steps.open-pull-request.outputs.pull-request-number }}
             #- name: Auto approve
               #if: steps.open-pull-request.outputs.pr_response_code == '201'
               #uses: juliangruber/approve-pull-request-action@v1
