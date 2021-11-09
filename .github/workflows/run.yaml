@@ -193,7 +193,9 @@ jobs:
                   echo "::set-output name=pull-request-number::${responsecode}"
                   headresponseline=$(head -n 1 headers.txt)
                   echo "headresponseline is ${headresponseline}"
-                  regex="^HTTP\/2 ([\d]{3})$"
+                  # regex="^HTTP\/2 ([\d]{3})$"
+                  # there is some non printable character at the end of the line that doesnt match \s
+                  regex="HTTP/2 ([0-9]{3})"
                   if [[ ${headresponseline} =~ ${regex} ]]; then
                     echo "::set-output name=pr_response_code::${BASH_REMATCH[1]}"
                   else
