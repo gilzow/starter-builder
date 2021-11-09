@@ -27,7 +27,7 @@ info:
           Composer-based build<br />
 
 initialize:
-  repository: git://github.com/platformsh-templates/drupal9.git@master
+  repository: git://github.com/gilzow/drupal9.git@master
   config: null
   files: []
   profile: Drupal 9

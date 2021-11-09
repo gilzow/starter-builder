@@ -106,7 +106,7 @@ jobs:
                   - template: 'spring-mvc-maven-mongodb'
                   - template: 'micronaut'
                   - template: 'pelican'
-                  #- template: 'wordpress-composer'
+                  - template: 'wordpress-composer'
                   - template: 'rails'
                   - template: 'aspnet-core'
                   - template: 'gin'
@@ -114,7 +114,7 @@ jobs:
                   - template: 'gatsby-drupal'
                   - template: 'microprofile-payara'
                   - template: 'sculpin'
-                  - template: 'drupal9'
+                  #- template: 'drupal9'
         steps:
             - uses: actions/checkout@v2
             - name: Setup Python
@@ -142,7 +142,7 @@ jobs:
               uses: actions/checkout@v2
               with:
                 token: ${{ secrets.DEVREL_TOKEN }}
-                repository: platformsh-templates/${{ matrix.template }}
+                repository: gilzow/${{ matrix.template }}
                 path: templates/${{ matrix.template }}/build
             - name: 'Initialize remote'
               run: |
@@ -186,4 +186,4 @@ jobs:
                   curl -s --location --request POST --header "Authorization: Bearer $GITHUB_TOKEN" \
                     --header 'Content-Type: application/json' \
                     --data-raw '{"head": "update", "base": "master", "title": "auto-updates"}' \
-                    https://api.github.com/repos/platformsh-templates/${{ matrix.template }}/pulls
+                    https://api.github.com/repos/gilzow/${{ matrix.template }}/pulls
