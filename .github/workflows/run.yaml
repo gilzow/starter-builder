@@ -208,7 +208,7 @@ jobs:
               run: |
                   echo "The pr_response code is ${{ steps.open-pull-request.outputs.pr_response_code }}"
                   echo "The Pr number is ${{ steps.open-pull-request.outputs.pull-request-number }}"
-                  echo "The PR Sha is ${{ steps.open-pull-request.outputs.pull_request_sha }}
+                  echo "The PR Sha is ${{ steps.open-pull-request.outputs.pull_request_sha }}"
 
             - name: Merge
               if: steps.open-pull-request.outputs.pr_response_code == '201'
