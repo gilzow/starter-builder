@@ -224,6 +224,7 @@ jobs:
                 MERGE_LABELS: ""
                 MERGE_METHOD: merge
                 PULL_REQUEST: gilzow/${{ matrix.template }}/${{ steps.open-pull-request.outputs.pull-request-number }}
+                LOG: DEBUG
             #- name: Merge
               #if: steps.open-pull-request.outputs.pr_response_code == '700'
               #uses: KeisukeYamashita/auto-pull-request-merge@v1
