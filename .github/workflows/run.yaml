@@ -226,6 +226,7 @@ jobs:
                 PULL_REQUEST: gilzow/${{ matrix.template }}/${{ steps.open-pull-request.outputs.pull-request-number }}
                 #URL: "https://github.com/gilzow/${{ matrix.template }}/pull/${{ steps.open-pull-request.outputs.pull-request-number }}"
                 LOG: "DEBUG"
+                MERGE_COMMIT_MESSAGE: "Automerge via template-builder"
             #- name: Merge
               #if: steps.open-pull-request.outputs.pr_response_code == '700'
               #uses: KeisukeYamashita/auto-pull-request-merge@v1

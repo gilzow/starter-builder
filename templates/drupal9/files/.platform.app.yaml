@@ -29,6 +29,7 @@ relationships:
 
 # The size of the persistent disk of the application (in MB).
 # Adding a fake comment
+# And another fake comment
 disk: 2048
 
 # The 'mounts' describe writable, persistent filesystem mounts in the application.
