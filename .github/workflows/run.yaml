@@ -260,20 +260,6 @@ jobs:
               #with:
                 #github-token: ${{ secrets.DEVREL_TOKEN }}
                 #number: ${{ steps.open-pull-request.outputs.pull-request-number }}
-    #autoapprove:
-        #needs:
-            #- update
-        #name: Auto Approve the PR by our template builder
-      #runs-on: ubuntu-latest
-      #steps:
-        #- name: Auto approve
-          #uses: hmarr/auto-approve-action@v2.0.0 # Custom action for auto approval already available on marketplace
-          # Perform the auto approve action only when the PR is raised by dependabot
-          #if: github.actor == 'gilzow' || github.actor == 'gilzow'
-          #with:
-            # Create a personal access token and store it under the Secrets section of the particular repository
-            # with the key "GITHUB_ACTIONS_TOKEN"
-            #github-token: ${{ secrets.DEVREL_TOKEN }}
     automerge:
       name: Auto merge after successful checks
       # By default, jobs run in parallel. To run the jobs sequentially, the keyword "needs" is needed.
@@ -281,6 +267,11 @@ jobs:
       needs: update
       runs-on: ubuntu-latest
       steps:
+        - name: Test vars
+          run: |
+            echo "Which template are we working on? ${{ matrix.template }}"
+            echo "What about our pull request number? ${{ needs.update.outputs.pullRequestNumber }}"
+
         - name: Auto merge
           # Custom action for auto merging already available on marketplace
           uses: pascalgn/automerge-action@135f0bdb927d9807b5446f7ca9ecc2c51de03c4a
