@@ -192,6 +192,8 @@ jobs:
 
                   prnumber=$(echo "${response}" | jq '.number')
                   echo "::set-output name=pull-request-number::${prnumber}"
+                  prsha=$(echo "${response}" | jq '.head.sha')
+                  echo "::set-output name=pull_request_sha::${prsha}"
                   headresponseline=$(head -n 1 headers.txt)
                   echo "headresponseline is ${headresponseline}"
                   # regex="^HTTP\/2 ([\d]{3})$"
@@ -206,6 +208,7 @@ jobs:
               run: |
                   echo "The pr_response code is ${{ steps.open-pull-request.outputs.pr_response_code }}"
                   echo "The Pr number is ${{ steps.open-pull-request.outputs.pull-request-number }}"
+                  echo "The PR Sha is ${{ steps.open-pull-request.outputs.pull_request_sha }}
 
             - name: Merge
               if: steps.open-pull-request.outputs.pr_response_code == '201'
@@ -216,6 +219,7 @@ jobs:
                     intervalSeconds: 10
                     timeoutSeconds: 60
                     pullRequestNumber: ${{ steps.open-pull-request.outputs.pull-request-number }}
+                    sha: ${{ steps.open-pull-request.outputs.pull_request_sha }}
                     comment: "Automerged"
             #- name: Merge Pull Request
               #if: steps.open-pull-request.outputs.pr_response_code == '201'
