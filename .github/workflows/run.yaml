@@ -214,7 +214,7 @@ jobs:
                     #token: ${{ secrets.DEVREL_TOKEN }}
                     repository: gilzow/${{ matrix.template }}
                     intervalSeconds: 10
-                    timeoutSeconds: 30
+                    timeoutSeconds: 60
                     pullRequestNumber: ${{ steps.open-pull-request.outputs.pull-request-number }}
                     comment: "Automerged"
             #- name: Merge Pull Request
