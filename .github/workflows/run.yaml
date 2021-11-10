@@ -209,9 +209,10 @@ jobs:
                   echo "The pr_response code is ${{ steps.open-pull-request.outputs.pr_response_code }}"
                   echo "The Pr number is ${{ steps.open-pull-request.outputs.pull-request-number }}"
                   echo "The PR Sha is ${{ steps.open-pull-request.outputs.pull_request_sha }}"
+                  echo "Who is our current actor?  ${{ github.actor }}"
 
             - name: Merge
-              if: steps.open-pull-request.outputs.pr_response_code == '201'
+              if: steps.open-pull-request.outputs.pr_response_code == '700'
               uses: KeisukeYamashita/auto-pull-request-merge@v1
               with:
                     #token: ${{ secrets.DEVREL_TOKEN }}
