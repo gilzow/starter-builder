@@ -42,6 +42,8 @@ jobs:
         needs: build
         runs-on: ubuntu-latest
         name: 'Template'
+        outputs:
+            pullRequestNumber: ${{ steps.open-pull-request.outputs.pull-request-number }}
         strategy:
             fail-fast: false
             matrix:
@@ -204,24 +206,25 @@ jobs:
                   else
                     echo "no match for response code?"
                   fi
+                  echo "::set-output name=currentactor::${{ github.actor }}"
             - name: Doublecheck output values
               run: |
                   echo "The pr_response code is ${{ steps.open-pull-request.outputs.pr_response_code }}"
                   echo "The Pr number is ${{ steps.open-pull-request.outputs.pull-request-number }}"
                   echo "The PR Sha is ${{ steps.open-pull-request.outputs.pull_request_sha }}"
-                  echo "Who is our current actor?  ${{ github.actor }}"
+                  echo "Who is our current actor?  ${{ steps.open-pull-request.outputs.currentactor }}"
 
-            - name: Merge
-              if: steps.open-pull-request.outputs.pr_response_code == '700'
-              uses: KeisukeYamashita/auto-pull-request-merge@v1
-              with:
+            #- name: Merge
+              #if: steps.open-pull-request.outputs.pr_response_code == '700'
+              #uses: KeisukeYamashita/auto-pull-request-merge@v1
+              #with:
                     #token: ${{ secrets.DEVREL_TOKEN }}
-                    repository: gilzow/${{ matrix.template }}
-                    intervalSeconds: 10
-                    timeoutSeconds: 60
-                    pullRequestNumber: ${{ steps.open-pull-request.outputs.pull-request-number }}
-                    sha: ${{ steps.open-pull-request.outputs.pull_request_sha }}
-                    comment: "Automerged"
+                    #repository: gilzow/${{ matrix.template }}
+                    #intervalSeconds: 10
+                    #timeoutSeconds: 60
+                    #pullRequestNumber: ${{ steps.open-pull-request.outputs.pull-request-number }}
+                    #sha: ${{ steps.open-pull-request.outputs.pull_request_sha }}
+                    #comment: "Automerged"
             #- name: Merge Pull Request
               #if: steps.open-pull-request.outputs.pr_response_code == '201'
               #run: |
@@ -257,3 +260,36 @@ jobs:
               #with:
                 #github-token: ${{ secrets.DEVREL_TOKEN }}
                 #number: ${{ steps.open-pull-request.outputs.pull-request-number }}
+    #autoapprove:
+        #needs:
+            #- update
+        #name: Auto Approve the PR by our template builder
+      #runs-on: ubuntu-latest
+      #steps:
+        #- name: Auto approve
+          #uses: hmarr/auto-approve-action@v2.0.0 # Custom action for auto approval already available on marketplace
+          # Perform the auto approve action only when the PR is raised by dependabot
+          #if: github.actor == 'gilzow' || github.actor == 'gilzow'
+          #with:
+            # Create a personal access token and store it under the Secrets section of the particular repository
+            # with the key "GITHUB_ACTIONS_TOKEN"
+            #github-token: ${{ secrets.DEVREL_TOKEN }}
+    automerge:
+      name: Auto merge after successful checks
+      # By default, jobs run in parallel. To run the jobs sequentially, the keyword "needs" is needed.
+      # Auto merge action can be done only when the PR is approved, hence this automerge needs autoapprove as a prerequisite
+      needs: update
+      runs-on: ubuntu-latest
+      steps:
+        - name: Auto merge
+          # Custom action for auto merging already available on marketplace
+          uses: pascalgn/automerge-action@135f0bdb927d9807b5446f7ca9ecc2c51de03c4a
+          # Perform the auto merge action only when the PR is raised by dependabot
+          if: github.actor == 'gilzow' || github.actor == 'gilzow'
+          env:
+            GITHUB_TOKEN: ${{ secrets.DEVREL_TOKEN }}
+            # By default, whenever dependabot raises a PR, it automatically assigns a label named "dependencies"
+            # So, this action merges those PRs labelled "dependencies" only
+            MERGE_LABELS: ""
+            MERGE_METHOD: merge
+            PULL_REQUEST: gilzow/${{ matrix.template }}/${{ needs.update.outputs.pullRequestNumber }}
