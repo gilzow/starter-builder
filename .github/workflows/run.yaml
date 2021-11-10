@@ -206,6 +206,17 @@ jobs:
               run: |
                   echo "The pr_response code is ${{ steps.open-pull-request.outputs.pr_response_code }}"
                   echo "The Pr number is ${{ steps.open-pull-request.outputs.pull-request-number }}"
+
+            - name: Merge
+              if: steps.open-pull-request.outputs.pr_response_code == '201'
+              uses: KeisukeYamashita/auto-pull-request-merge@v1
+              with:
+                    #token: ${{ secrets.DEVREL_TOKEN }}
+                    repository: gilzow/${{ matrix.template }}
+                    intervalSeconds: 10
+                    timeoutSeconds: 30
+                    pullRequestNumber: ${{ steps.open-pull-request.outputs.pull-request-number }}
+                    comment: "Automerged"
             #- name: Merge Pull Request
               #if: steps.open-pull-request.outputs.pr_response_code == '201'
               #run: |
