@@ -214,7 +214,7 @@ jobs:
                   echo "The PR Sha is ${{ steps.open-pull-request.outputs.pull_request_sha }}"
                   echo "Who is our current actor?  ${{ steps.open-pull-request.outputs.currentactor }}"
             - name: Automatically merge only after necessary requirements are met
-              if: -n ${{ steps.open-pull-request.outputs.pull-request-number }} && steps.open-pull-request.outputs.pr_response_code == '201'
+              if: -n steps.open-pull-request.outputs.pull-request-number && steps.open-pull-request.outputs.pr_response_code == '201'
               run: |
                   gh pr merge ${{ steps.open-pull-request.outputs.pull-request-number }} --auto --merge --repo=gilzow/${{ matrix.template }}
                   lastcommand=$?
