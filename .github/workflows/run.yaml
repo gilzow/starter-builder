@@ -191,7 +191,7 @@ jobs:
                   response=$(gh pr create --head update --base master --title "auto-updates" --body "automated update from template-builder" --repo gilzow/${{ matrix.template }})
                   # if the cli returns 1, i believe the step will fail so I dont think we need to capture it
                   boolPRCreated=$?
-                  prRegex="([\d]+$)"
+                  prRegex="([0-9]+$)"
                   if [[ -n "${response}" && $response =~ $prRegex ]]; then
                     echo "::set-output name=pr_response_code::${BASH_REMATCH[1]}"
                   else
