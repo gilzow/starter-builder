@@ -187,40 +187,22 @@ jobs:
             - name: 'Open pull request'
               id: open-pull-request
               run: |
-                  response=$(curl -s --location --request POST --header "Authorization: Bearer $GITHUB_TOKEN" \
-                    --header 'Content-Type: application/json' \
-                    --data-raw '{"head": "update", "base": "master", "title": "auto-updates", "auto_merge": "true"}' \
-                    -D headers.txt https://api.github.com/repos/gilzow/${{ matrix.template }}/pulls)
-
-                  prnumber=$(echo "${response}" | jq '.number')
-                  echo "::set-output name=pull-request-number::${prnumber}"
-                  prsha=$(echo "${response}" | jq '.head.sha')
-                  echo "::set-output name=pull_request_sha::${prsha}"
-                  headresponseline=$(head -n 1 headers.txt)
-                  echo "headresponseline is ${headresponseline}"
-                  # regex="^HTTP\/2 ([\d]{3})$"
-                  # there is some non printable character at the end of the line that doesnt match \s
-                  regex="HTTP/2 ([0-9]{3})"
-                  if [[ ${headresponseline} =~ ${RESPONSE_CODE_REGEX} ]]; then
+                  #if successful, the cli will return the URL to the created PR
+                  response=$(gh pr create --head update --base master --title "auto-updates" --body "automated update from template-builder" --repo platformsh-templates/${{ matrix.template )
+                  # if the cli returns 1, i believe the step will fail so I dont think we need to capture it
+                  boolPRCreated=$?
+                  prRegex="([\d]+$)"
+                  if [[ -n "${response}" && $response =~ $prRegex ]]; then
                     echo "::set-output name=pr_response_code::${BASH_REMATCH[1]}"
                   else
-                    echo "no match for response code?"
-                  fi
-
-                  if [[ "${BASH_REMATCH[1]}" != '201' ]]; then
-                    echo "Hey, the PR creation failed:"
+                    echo "cli didn't fail but response is empty or didnt match the regex?"
                     echo "${response}"
                   fi
-
-                  echo "::set-output name=currentactor::${{ github.actor }}"
             - name: Doublecheck output values
               run: |
-                  echo "The pr_response code is ${{ steps.open-pull-request.outputs.pr_response_code }}"
                   echo "The Pr number is ${{ steps.open-pull-request.outputs.pull-request-number }}"
-                  echo "The PR Sha is ${{ steps.open-pull-request.outputs.pull_request_sha }}"
-                  echo "Who is our current actor?  ${{ steps.open-pull-request.outputs.currentactor }}"
             - name: Automatically merge only after necessary requirements are met
-              if: steps.open-pull-request.outputs.pull-request-number != '' && steps.open-pull-request.outputs.pr_response_code == '201'
+              if: steps.open-pull-request.outputs.pull-request-number != ''
               run: |
                   gh pr merge ${{ steps.open-pull-request.outputs.pull-request-number }} --auto --merge --repo=gilzow/${{ matrix.template }}
                   lastcommand=$?
