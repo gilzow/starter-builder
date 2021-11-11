@@ -16,7 +16,7 @@ Drupal is a flexible and extensible PHP-based CMS framework.
 * MariaDB 10.4
 * Redis 5
 * Drush included
-* Automatic TLS certificates
+* Automatic TLS certificates (yeah, boooooy!)
 * Composer-based build
 
 ## Post-install
