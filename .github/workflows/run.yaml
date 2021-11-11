@@ -215,6 +215,6 @@ jobs:
                   echo "Who is our current actor?  ${{ steps.open-pull-request.outputs.currentactor }}"
             - name: Automatically merge only after necessary requirements are met
               run: |
-                  gh pr merge ${{ steps.open-pull-request.outputs.pull-request-number }} --auto --repo=gilzow/${{ matrix.template }}
+                  gh pr merge ${{ steps.open-pull-request.outputs.pull-request-number }} --auto --merge --repo=gilzow/${{ matrix.template }}
                   lastcommand=$?
                   # @TODO what, if anything, should we do if we can't set the AutoMR flag?
