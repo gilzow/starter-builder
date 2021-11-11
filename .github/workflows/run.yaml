@@ -213,65 +213,8 @@ jobs:
                   echo "The Pr number is ${{ steps.open-pull-request.outputs.pull-request-number }}"
                   echo "The PR Sha is ${{ steps.open-pull-request.outputs.pull_request_sha }}"
                   echo "Who is our current actor?  ${{ steps.open-pull-request.outputs.currentactor }}"
-            - name: Auto merge
-              # Custom action for auto merging already available on marketplace
-              uses: pascalgn/automerge-action@v0.14.3
-              # Perform the auto merge action only when the PR is raised by dependabot
-              if: github.actor == 'gilzow' || github.actor == 'gilzow'
-              env:
-                # By default, whenever dependabot raises a PR, it automatically assigns a label named "dependencies"
-                # So, this action merges those PRs labelled "dependencies" only
-                MERGE_LABELS: ""
-                MERGE_METHOD: merge
-                PULL_REQUEST: gilzow/${{ matrix.template }}/${{ steps.open-pull-request.outputs.pull-request-number }}
-                #URL: "https://github.com/gilzow/${{ matrix.template }}/pull/${{ steps.open-pull-request.outputs.pull-request-number }}"
-                LOG: "DEBUG"
-                MERGE_COMMIT_MESSAGE: "Automerge via template-builder"
-            #- name: Merge
-              #if: steps.open-pull-request.outputs.pr_response_code == '700'
-              #uses: KeisukeYamashita/auto-pull-request-merge@v1
-              #with:
-                    #token: ${{ secrets.DEVREL_TOKEN }}
-                    #repository: gilzow/${{ matrix.template }}
-                    #intervalSeconds: 10
-                    #timeoutSeconds: 60
-                    #pullRequestNumber: ${{ steps.open-pull-request.outputs.pull-request-number }}
-                    #sha: ${{ steps.open-pull-request.outputs.pull_request_sha }}
-                    #comment: "Automerged"
-            #- name: Merge Pull Request
-              #if: steps.open-pull-request.outputs.pr_response_code == '201'
-              #run: |
-                  #response=$(curl -s --location --request PUT --header "Authorization: Bearer $GITHUB_TOKEN" \
-                    #--header 'Accept: application/vnd.github.v3+json' \
-                    #-d '{"commit_title":"Auto Update Acceptance from Template Updater"}' \
-                    #-D headers.txt https://api.github.com/repos/gilzow/${{ matrix.template }}/pulls/${{ steps.open-pull-request.outputs.pull-request-number }}/merge)
-
-                  #headresponseline=$(head -n 1 headers.txt)
-                  #if [[ ${headresponseline} =~ ${RESPONSE_CODE_REGEX} ]]; then
-                    #responsecode=${BASH_REMATCH[1]}
-                  #else
-                    #responsecode="No code received"
-                  #fi
-
-                  #echo "response code from merge acceptance was ${responsecode}"
-
-                  #mergeMessage=$(echo "${response}" | jq '.message')
-
-                  #echo "Message from merge acceptance was ${mergeMessage}"
-
-
-            #- name: Enable Pull Request Automerge
-              #if: steps.open-pull-request.outputs.pr_response_code == '201'
-              #uses: peter-evans/enable-pull-request-automerge@v1
-              #with:
-                #repository: gilzow/${{ matrix.template }}
-                #token: ${{ secrets.DEVREL_TOKEN }}
-                #pull-request-number: ${{ steps.open-pull-request.outputs.pull-request-number }}
-            #- name: Auto approve
-              #if: steps.open-pull-request.outputs.pr_response_code == '201'
-              #uses: juliangruber/approve-pull-request-action@v1
-              #with:
-                #github-token: ${{ secrets.DEVREL_TOKEN }}
-                #number: ${{ steps.open-pull-request.outputs.pull-request-number }}
-
-
+            - name: Automatically merge only after necessary requirements are met
+              run: |
+                  gh pr merge ${{ steps.open-pull-request.outputs.pull-request-number }} --auto --repo=gilzow/${{ matrix.template }}
+                  lastcommand=$?
+                  # @TODO what, if anything, should we do if we can't set the AutoMR flag?
