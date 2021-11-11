@@ -207,7 +207,7 @@ jobs:
                     echo "no match for response code?"
                   fi
 
-                  if [[ "${BASH_REMATCH[1]} != '201' ]]; then
+                  if [[ "${BASH_REMATCH[1]}" != '201' ]]; then
                     echo "Hey, the PR creation failed:"
                     echo "${response}"
                   fi
